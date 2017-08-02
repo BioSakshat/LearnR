@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="BioSakshat" />
+
+<meta name="date" content="2017-06-22" />
+
+<title>PCA_using_ggfortify</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+<link href="site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">BRLS-2017</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-gear"></span>
+     
+    Data Structure
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="intro.html">Introduction</a>
+    </li>
+    <li>
+      <a href="vector.html">Vector</a>
+    </li>
+    <li>
+      <a href="matrix.html">Matrix and Array</a>
+    </li>
+    <li>
+      <a href="dataframe.html">Data Frame</a>
+    </li>
+    <li>
+      <a href="list.html">List</a>
+    </li>
+    <li>
+      <a href="loop.html">Conditions/Loops</a>
+    </li>
+    <li>
+      <a href="function.html">Function</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-gear"></span>
+     
+    Data Manipulation
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="io.html">Input-Output</a>
+    </li>
+    <li>
+      <a href="apply.html">Apply set of function</a>
+    </li>
+    <li>
+      <a href="dplyr.html">Dplyr</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-gear"></span>
+     
+    Visualization
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="baseGraphics.html">Base Graphics</a>
+    </li>
+    <li>
+      <a href="ggplot2.html">ggplot2 Graphics</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="bioconductor.html">Bioconductor</a>
+</li>
+<li>
+  <a href="casestudy.html">Case study</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    <span class="fa fa-gear"></span>
+     
+    Tasks
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="task.html">Tasks</a>
+    </li>
+    <li>
+      <a href="solution.html">Solutions</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="study.html">StudyMore</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">PCA_using_ggfortify</h1>
+<h4 class="author"><em>BioSakshat</em></h4>
+<h4 class="date"><em>22 June 2017</em></h4>
+
+</div>
+
+
+<div id="lets-begin" class="section level2">
+<h2>Lets Begin</h2>
+<div id="load-ggfortify-library" class="section level3">
+<h3>Load ggfortify library</h3>
+<pre class="r"><code>library(ggfortify)</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+</div>
+<div id="load-iris-dataset" class="section level3">
+<h3>Load IRIS dataset</h3>
+<pre class="r"><code>head(iris);</code></pre>
+<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa</code></pre>
+</div>
+<div id="do-pca" class="section level3">
+<h3>Do PCA</h3>
+<pre class="r"><code>piris=princomp(iris[,-5]);
+# print piris summary
+piris;</code></pre>
+<pre><code>## Call:
+## princomp(x = iris[, -5])
+## 
+## Standard deviations:
+##    Comp.1    Comp.2    Comp.3    Comp.4 
+## 2.0494032 0.4909714 0.2787259 0.1538707 
+## 
+##  4  variables and  150 observations.</code></pre>
+<pre class="r"><code># Check structure of piris
+str(piris);</code></pre>
+<pre><code>## List of 7
+##  $ sdev    : Named num [1:4] 2.049 0.491 0.279 0.154
+##   ..- attr(*, &quot;names&quot;)= chr [1:4] &quot;Comp.1&quot; &quot;Comp.2&quot; &quot;Comp.3&quot; &quot;Comp.4&quot;
+##  $ loadings: loadings [1:4, 1:4] 0.3614 -0.0845 0.8567 0.3583 -0.6566 ...
+##   ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. ..$ : chr [1:4] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot; &quot;Petal.Length&quot; &quot;Petal.Width&quot;
+##   .. ..$ : chr [1:4] &quot;Comp.1&quot; &quot;Comp.2&quot; &quot;Comp.3&quot; &quot;Comp.4&quot;
+##  $ center  : Named num [1:4] 5.84 3.06 3.76 1.2
+##   ..- attr(*, &quot;names&quot;)= chr [1:4] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot; &quot;Petal.Length&quot; &quot;Petal.Width&quot;
+##  $ scale   : Named num [1:4] 1 1 1 1
+##   ..- attr(*, &quot;names&quot;)= chr [1:4] &quot;Sepal.Length&quot; &quot;Sepal.Width&quot; &quot;Petal.Length&quot; &quot;Petal.Width&quot;
+##  $ n.obs   : int 150
+##  $ scores  : num [1:150, 1:4] -2.68 -2.71 -2.89 -2.75 -2.73 ...
+##   ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. ..$ : NULL
+##   .. ..$ : chr [1:4] &quot;Comp.1&quot; &quot;Comp.2&quot; &quot;Comp.3&quot; &quot;Comp.4&quot;
+##  $ call    : language princomp(x = iris[, -5])
+##  - attr(*, &quot;class&quot;)= chr &quot;princomp&quot;</code></pre>
+</div>
+<div id="pca-biplot" class="section level3">
+<h3>PCA biplot</h3>
+<p><strong>Plot PC1 vs PC2</strong></p>
+<pre class="r"><code>autoplot(piris, x=1, y=2);</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><strong>Plot PC2 and PC3</strong></p>
+<pre class="r"><code>autoplot(piris, x=2, y=3);</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><strong>Draw Frame (draws convex for each cluster)</strong></p>
+<pre class="r"><code>autoplot(piris, x=1, y=2, frame=TRUE);</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><strong>Pass original data for additional features</strong></p>
+<pre class="r"><code>autoplot(piris, x=1, y=2, data=iris, colour=&#39;Species&#39;);</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><strong>Draw PCA loadings</strong></p>
+<pre class="r"><code>autoplot(piris, x=1, y=2, data=iris, colour=&#39;Species&#39;, loadings = TRUE, loadings.label = TRUE, loadings.colour = &#39;blue&#39;, loadings.label.size = 3);</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><strong>Show frame</strong></p>
+<pre class="r"><code>autoplot(piris, x=1, y=2, data=iris, frame=TRUE, colour=&#39;Species&#39;);</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>autoplot(piris, x=1, y=2, data=iris, frame=TRUE, colour=&#39;Species&#39;, frame.type=&#39;t&#39;);</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<p><strong>Show Labels</strong></p>
+<pre class="r"><code>autoplot(piris, x=1, y=2, data=iris, colour=&#39;Species&#39;, label=TRUE, label.size=3, shape=FALSE);</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="scree-plot" class="section level3">
+<h3>Scree plot</h3>
+<pre class="r"><code>piris_sdev=data.frame(name=names(piris$sdev), sdev=piris$sdev);
+piris_sdev;</code></pre>
+<pre><code>##          name      sdev
+## Comp.1 Comp.1 2.0494032
+## Comp.2 Comp.2 0.4909714
+## Comp.3 Comp.3 0.2787259
+## Comp.4 Comp.4 0.1538707</code></pre>
+<pre class="r"><code>ggplot(piris_sdev, aes(x=name, y=sdev))+geom_col()</code></pre>
+<p><img src="PCA_using_ggplot2_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="other-pca-options" class="section level3">
+<h3>Other PCA options</h3>
+<pre class="r"><code># cor=TRUE will use correlation matrix rather the covariance matrix
+piris1=princomp(iris[,-5], cor=TRUE) ;
+piris;</code></pre>
+<pre><code>## Call:
+## princomp(x = iris[, -5])
+## 
+## Standard deviations:
+##    Comp.1    Comp.2    Comp.3    Comp.4 
+## 2.0494032 0.4909714 0.2787259 0.1538707 
+## 
+##  4  variables and  150 observations.</code></pre>
+<pre class="r"><code>piris1;</code></pre>
+<pre><code>## Call:
+## princomp(x = iris[, -5], cor = TRUE)
+## 
+## Standard deviations:
+##    Comp.1    Comp.2    Comp.3    Comp.4 
+## 1.7083611 0.9560494 0.3830886 0.1439265 
+## 
+##  4  variables and  150 observations.</code></pre>
+</div>
+<div id="references" class="section level3">
+<h3>References</h3>
+<ol style="list-style-type: decimal">
+<li><a href="https://cran.r-project.org/web/packages/ggfortify/vignettes/plot_pca.html" class="uri">https://cran.r-project.org/web/packages/ggfortify/vignettes/plot_pca.html</a></li>
+</ol>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

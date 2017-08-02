@@ -11,9 +11,9 @@ knitr::opts_chunk$set(
  
 # LearnR
 
-The goal of LearnR is to ...
+The goal of LearnR is to give you quick
 
-## Installation
+## Browse
 
 You can install LearnR from github with:
 
