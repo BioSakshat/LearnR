@@ -1,8 +1,8 @@
 ---
-output: github_document
+#output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd. Please edit that file 
 
 ```{r, echo = FALSE, eval=FALSE}
 knitr::opts_chunk$set(
@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 ```
+-->
 
 # LearnR
 
