@@ -13,4 +13,6 @@ knitr::opts_chunk$set(
 
 Click on https://prpanigrahi.github.io/LearnR/index.html to start learning
 
+# Browse
+All contents are in docs directory.
 
