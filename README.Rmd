@@ -1,0 +1,31 @@
+<!-- README.md is generated from README.Rmd. Please edit that file
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+-->
+ 
+# LearnR
+
+The goal of LearnR is to ...
+
+## Installation
+
+You can install LearnR from github with:
+
+```{r gh-installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("prpanigrahi/LearnR")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+```{r example}
+## basic example code
+```
